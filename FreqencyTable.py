@@ -1,6 +1,6 @@
 import pandas as pd
 
-def FrequencyTable(Series):   
+def FrequencyTable(series_data):   
     # ===============================================================
     # Inputs:
     #     Series -- A series to be turned into a frequency table.
@@ -12,12 +12,18 @@ def FrequencyTable(Series):
     # Notes
     #     Please add data validation to this -- JP
     # ===============================================================
+    
+    print('test')
     table_structure = {
-        'Normalized':Series.value_counts(normalize = True).round(4)*100,
-        'Absolute':Series.value_counts(normalize = False)
+          'Normalized':series_data.value_counts(normalize = True).round(4)
+        , 'Absolute':series_data.value_counts(normalize = False)
     }
     table = pd.concat(table_structure,axis=1)
-    sums = pd.DataFrame({'Normalized':table[table.columns[0]].sum().round(4),
-            'Absolute':table[table.columns[1]].sum()},index = ['Totals']  )
-    table = table.append(sums)
+    sums = pd.DataFrame(
+            {
+                'Normalized':series_data.value_counts(normalize = True).sum().round(4),
+                'Absolute':series_data.value_counts(normalize = False).sum()
+            }
+            ,index = ['Totals'] )
+    table = pd.concat([table,sums])
     return table

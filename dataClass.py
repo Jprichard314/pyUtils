@@ -1,8 +1,8 @@
-from msilib import text
+#from msilib import text
 import pandas
-from python_tools import Tools_Personal
-from python_tools import SummaryStatistics
-from python_tools import text_analysis
+import Tools_Personal
+import SummaryStatistics
+import text_analysis
 
 class biFramework:
     def __init__(self,df):
