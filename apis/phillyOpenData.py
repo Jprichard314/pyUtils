@@ -1,8 +1,10 @@
 # cartoApi
 import urllib.parse
 import requests
+import polars
 import pandas
-import datetime
+from datetime import datetime
+from dateutil import relativedelta
 
 def writeDateTimeFilter(
           end_date
@@ -10,30 +12,15 @@ def writeDateTimeFilter(
         , base_query
         , date_field
 ):
-    # Create start date
-    start_date = (
-        (
-                pandas.to_datetime(
-                    datetime.datetime.strptime(end_date,"%m/%d/%Y")
-                ) - pandas.DateOffset(months = interval)
-        )
-         .to_period('m')
-         .strftime('%m/%d/%Y')
-    )
 
     # truncate end_date
-    end_date = (
-        (
-                pandas.to_datetime(
-                    datetime.datetime.strptime(end_date,"%m/%d/%Y")
-                ) - pandas.DateOffset(months = 1)
-        )
-         .to_period('m')
-         .strftime('%m/%d/%Y')
-    )
+    end_date = (datetime.strptime(end_date, '%m/%d/%Y'))
+
+    # Create start date
+    start_date = end_date - relativedelta.relativedelta(months = interval)
 
     # create datetime query
-    query = f"{base_query} WHERE {date_field} <= '{end_date}' AND {date_field} >= '{start_date}'"
+    query = f"{base_query} WHERE {date_field} <= '{end_date:%m/%d/%Y}' AND {date_field} >= '{start_date:%m/%d/%Y}'"
 
     return(query)
 
@@ -52,5 +39,6 @@ class cartoApi:
         return request.content
     
     def queryDataframe(self):
-        data = pandas.read_csv(self.request_url)
+        data = polars.read_csv(self.request_url)
         return(data)
+    
