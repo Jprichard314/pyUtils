@@ -1,8 +1,10 @@
 # cartoApi
 import urllib.parse
 import requests
+import polars
 import pandas
-import datetime
+from datetime import datetime
+from dateutil import relativedelta
 
 def writeDateTimeFilter(
           end_date
@@ -10,30 +12,15 @@ def writeDateTimeFilter(
         , base_query
         , date_field
 ):
-    # Create start date
-    start_date = (
-        (
-                pandas.to_datetime(
-                    datetime.datetime.strptime(end_date,"%m/%d/%Y")
-                ) - pandas.DateOffset(months = interval)
-        )
-         .to_period('m')
-         .strftime('%m/%d/%Y')
-    )
 
     # truncate end_date
-    end_date = (
-        (
-                pandas.to_datetime(
-                    datetime.datetime.strptime(end_date,"%m/%d/%Y")
-                ) - pandas.DateOffset(months = 1)
-        )
-         .to_period('m')
-         .strftime('%m/%d/%Y')
-    )
+    end_date = (datetime.strptime(end_date, '%m/%d/%Y'))
+
+    # Create start date
+    start_date = end_date - relativedelta.relativedelta(months = interval)
 
     # create datetime query
-    query = f"{base_query} WHERE {date_field} <= '{end_date}' AND {date_field} >= '{start_date}'"
+    query = f"{base_query} WHERE {date_field} <= '{end_date:%m/%d/%Y}' AND {date_field} >= '{start_date:%m/%d/%Y}'"
 
     return(query)
 
@@ -51,6 +38,12 @@ class cartoApi:
         request = requests.get(self.request_url)
         return request.content
     
-    def queryDataframe(self):
+    def po_queryDataframe(self, **kwargs):
+        data = polars.read_csv(self.request_url, 
+                               infer_schema_length = kwargs['infer_schema_length'] if kwargs['infer_schema_length'] is not None else 100,
+                               schema_overrides = kwargs['schema_overrides'] if kwargs['schema_overrides'] is not None else None)
+        return(data)
+    
+    def pa_queryDataframe(self):
         data = pandas.read_csv(self.request_url)
         return(data)
