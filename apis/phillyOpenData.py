@@ -38,11 +38,12 @@ class cartoApi:
         request = requests.get(self.request_url)
         return request.content
     
-    def queryDataframe(self, **kwargs):
+    def po_queryDataframe(self, **kwargs):
         data = polars.read_csv(self.request_url, 
                                infer_schema_length = kwargs['infer_schema_length'] if kwargs['infer_schema_length'] is not None else 100,
                                schema_overrides = kwargs['schema_overrides'] if kwargs['schema_overrides'] is not None else None)
         return(data)
     
-
-
+    def pa_queryDataframe(self):
+        data = pandas.read_csv(self.request_url)
+        return(data)
