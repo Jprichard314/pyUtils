@@ -27,6 +27,9 @@ class s3_bucket_object:
     
     def __post_init__(self):
 
+        if self.stage not in self.valid_stages:
+            raise ValueError(f"Stage set with improper value. \n Accepted values {self.valid_stages}")
+
         # validate tag input
         for key in self.required_tags.keys():
             if key not in self.tags.keys():
@@ -56,12 +59,10 @@ class s3_bucket_object:
             pass
     
     def _create_key(self):
-        self.key = f"{self.project}/{self.datetime_partitions}/data.parquet"
+        self.key = f"{self.stage}/{self.project}/{self.datetime_partitions}/data.parquet"
 
 
     def push_to_bucket(self):
         pass
     
-
-
     # write to bucket
